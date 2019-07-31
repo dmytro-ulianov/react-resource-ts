@@ -15,6 +15,7 @@
     "test": "tsdx test --env=jsdom"
   },
   "peerDependencies": {
+    "@featherweight/resource-ts": "0.1.2",
     "react": ">=16"
   },
   "husky": {
