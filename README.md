@@ -1,0 +1,1 @@
+# @featherweight/react-resource-ts
