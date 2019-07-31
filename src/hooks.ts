@@ -107,7 +107,7 @@ export const useResource = <O, D, E = any>(
 
     if (ms > 0) {
       pendingAction = () => {
-        pendingTimeout = setTimeout(() => update({type: 'pending'}), ms)
+        pendingTimeout = window.setTimeout(() => update({type: 'pending'}), ms)
       }
     } else {
       pendingAction = () => update({type: 'pending'})
