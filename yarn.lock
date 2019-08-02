@@ -599,9 +599,9 @@
     exec-sh "^0.3.2"
     minimist "^1.2.0"
 
-"@featherweight/resource-ts@0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@featherweight/resource-ts/-/resource-ts-0.1.2.tgz#36552895be994dfcd137a20eb46687b36b03fe87"
+"@featherweight/resource-ts@0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@featherweight/resource-ts/-/resource-ts-0.3.1.tgz#d79f4572e198dba7685594ce631ab4db1be05111"
 
 "@jest/console@^24.7.1":
   version "24.7.1"
@@ -2222,6 +2222,10 @@ form-data@~2.3.2:
     asynckit "^0.4.0"
     combined-stream "^1.0.6"
     mime-types "^2.1.12"
+
+fp-ts@2.0.x:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.0.3.tgz#b6af5481aa5df027de250bacefa19d36d79edd51"
 
 fragment-cache@^0.2.1:
   version "0.2.1"

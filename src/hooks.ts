@@ -184,6 +184,10 @@ useResource.withError = <E>() => <O, D>(
   value: D
 } => useResource<O, D, E>(f, config)
 
+export const useTask = <O, D>(f: F<O, D>, config?: Config<O>) => {
+  return useResource.withError<Error>()(f, config)
+}
+
 export const create = <O, D, E = any>(
   f: F<O, D>,
   factoryConfig?: Config<O>,
