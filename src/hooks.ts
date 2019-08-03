@@ -7,7 +7,7 @@ import {
   Tag,
 } from '@featherweight/resource-ts'
 import {getReducer, CustomReducer} from './state'
-import {useEffect, useReducer, useRef} from 'react'
+import {useEffect, useReducer, useRef, useMemo} from 'react'
 import {useResourceContext} from './context'
 
 const noop = () => {}
@@ -47,13 +47,14 @@ const useAbortController = () => {
     abortControllerRef.current = new AbortController()
   }
 
-  return {
-    abort: () => (abortControllerRef.current as AbortController).abort(),
-    renew: () => {
-      abortControllerRef.current = new AbortController()
-    },
-    signal: () => (abortControllerRef.current as AbortController).signal,
-  }
+  return useMemo(
+    () => ({
+      abort: () => (abortControllerRef.current as AbortController).abort(),
+      renew: () => (abortControllerRef.current = new AbortController()),
+      signal: () => (abortControllerRef.current as AbortController).signal,
+    }),
+    [],
+  )
 }
 
 const useIsMounted = () => {
@@ -74,6 +75,7 @@ export const useResource = <O, D, E = any>(
   isInitial: boolean
   isPending: boolean
   isSucceded: boolean
+  reset: () => void
   resource: Resource<D, E>
   run: (args?: O) => Promise<Resource<D, E>>
   state: Tag
@@ -90,6 +92,13 @@ export const useResource = <O, D, E = any>(
   const cancelF = () => {
     abortController.abort()
     abortController.renew()
+  }
+
+  const resetF = () => {
+    update({type: 'initial'})
+    if (_config.namespace) {
+      context.cache.remove(_config.namespace)
+    }
   }
 
   const callF = (args?: O): Promise<Resource<D, E>> => {
@@ -161,6 +170,7 @@ export const useResource = <O, D, E = any>(
     isInitial: is.initial(state),
     isPending: is.pending(state),
     isSucceded: is.succeded(state),
+    reset: resetF,
     resource: state,
     run: callF,
     state: state._tag,
