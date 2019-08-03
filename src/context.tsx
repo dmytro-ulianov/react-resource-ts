@@ -4,6 +4,7 @@ type Cache = {
   clear: () => void
   get: (key: string) => any
   records: Record<string, any>
+  remove: (key: string) => void
   set: (key: string, value: any) => void
 }
 
@@ -30,16 +31,22 @@ export const ResourceProvider: React.FC<ProviderProps> = props => {
 
   const get = useCallback((key: string) => records[key], [records])
 
+  const remove = useCallback(
+    (key: string) => setRecords(records => ({...records, [key]: undefined})),
+    [setRecords],
+  )
+
   const set = useCallback(
     (key: string, value: any) =>
       setRecords(records => ({...records, [key]: value})),
     [setRecords],
   )
 
-  const cache = useMemo(() => ({clear, get, records, set}), [
+  const cache = useMemo(() => ({clear, get, records, remove, set}), [
     clear,
     get,
     records,
+    remove,
     set,
   ])
 
