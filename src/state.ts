@@ -6,7 +6,7 @@ import {
   Resource,
 } from '@featherweight/resource-ts'
 
-export type ReducerState = Resource<any, any>
+export type ReducerState<D = any, E = any> = Resource<D, E>
 
 type Action =
   | {type: 'failed'; payload: {error: any}}
@@ -35,9 +35,9 @@ export type CustomReducer<D = any, E = any> = (
   newState: Resource<D, E>,
 ) => Resource<D, E>
 
-export const getReducer = (
-  customReducer: CustomReducer = (_a, _b, _c) => _c,
-) => (state: ReducerState, action: Action) => {
+export const getReducer = <D, E>(
+  customReducer: CustomReducer<D, E> = (_a, _b, _c) => _c,
+) => (state: ReducerState<D, E>, action: Action) => {
   const rootResult = reducer(state, action)
   return customReducer(state || rootResult, action, rootResult)
 }

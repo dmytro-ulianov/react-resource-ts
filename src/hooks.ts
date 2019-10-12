@@ -28,8 +28,10 @@ export type Config<O = any, D = any, E = any> = {
   skipPending?: number
 }
 
-const toDefaults = (c: Config): Required<Config> => ({
-  args: c.args || null,
+const toDefaults = <O, D, E>(
+  c: Config<O, D, E>,
+): Required<Config<O, D, E>> => ({
+  args: c.args || ((null as unknown) as O),
   chain: c.chain || succeded(true),
   defer: c.defer || false,
   dependencies: c.dependencies || [],
@@ -65,23 +67,52 @@ const useIsMounted = () => {
   return mountedRef
 }
 
-export const useResource = <O, D, E = any>(
-  f: F<O, D>,
-  config?: Config<O, D, E>,
-): {
+type ResourceBase<O, D, E> = {
   cancel: () => void
-  error: E
-  isFailed: boolean
-  isInitial: boolean
-  isPending: boolean
-  isSucceded: boolean
   reset: () => void
   resource: Resource<D, E>
   run: (args?: O) => Promise<Resource<D, E>>
-  state: Tag
-  value: D
-} => {
-  const _config = toDefaults(config || {})
+}
+
+type ResourceValues<D, E> =
+  | {
+      isFailed: false
+      isInitial: true
+      isPending: false
+      isSucceded: false
+      state: 'initial'
+    }
+  | {
+      isFailed: false
+      isInitial: false
+      isPending: true
+      isSucceded: false
+      state: 'pending'
+    }
+  | {
+      isFailed: true
+      isInitial: false
+      isPending: false
+      isSucceded: false
+      state: 'failed'
+      error: E
+    }
+  | {
+      isFailed: false
+      isInitial: false
+      isPending: false
+      isSucceded: true
+      state: 'succeded'
+      value: D
+    }
+
+type ResourceReturnType<O, D, E> = ResourceBase<O, D, E> & ResourceValues<D, E>
+
+export const useResource = <O, D, E = any>(
+  f: F<O, D>,
+  config: Config<O, D, E> = {},
+): ResourceReturnType<O, D, E> => {
+  const _config = toDefaults(config)
 
   const context = useResourceContext()
 
@@ -163,36 +194,30 @@ export const useResource = <O, D, E = any>(
     // eslint-disable-next-line
   }, _config.dependencies)
 
-  return {
+  const base: ResourceBase<O, D, E> = {
     cancel: cancelF,
-    error: is.failed(state) ? state.error : null,
-    isFailed: is.failed(state),
-    isInitial: is.initial(state),
-    isPending: is.pending(state),
-    isSucceded: is.succeded(state),
     reset: resetF,
     resource: state,
     run: callF,
-    state: state._tag,
-    value: is.succeded(state) ? state.value : null,
   }
+
+  const values: ResourceValues<D, E> = {
+    error: is.failed(state) ? state.error : undefined,
+    isFailed: is.failed(state) as any,
+    isInitial: is.initial(state) as any,
+    isPending: is.pending(state) as any,
+    isSucceded: is.succeded(state) as any,
+    state: state._tag as any,
+    value: is.succeded(state) ? state.value : undefined,
+  }
+
+  return {...base, ...values}
 }
 
 useResource.withError = <E>() => <O, D>(
   f: F<O, D>,
   config?: Config<O, D, E>,
-): {
-  cancel: () => void
-  error: E
-  isFailed: boolean
-  isInitial: boolean
-  isPending: boolean
-  isSucceded: boolean
-  resource: Resource<D, E>
-  run: (args?: O) => Promise<Resource<D, E>>
-  state: Tag
-  value: D
-} => useResource<O, D, E>(f, config)
+): ResourceReturnType<O, D, E> => useResource<O, D, E>(f, config)
 
 export const useTask = <O, D>(f: F<O, D>, config?: Config<O, D, Error>) => {
   return useResource.withError<Error>()(f, config)

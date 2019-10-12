@@ -1,6 +1,6 @@
 import React, {useCallback, useContext, useMemo, useState} from 'react'
 
-type Cache = {
+export type Cache = {
   clear: () => void
   get: (key: string) => any
   records: Record<string, any>
