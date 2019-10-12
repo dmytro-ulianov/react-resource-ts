@@ -180,7 +180,7 @@ export const useResource = <O, D, E = any>(
 
 useResource.withError = <E>() => <O, D>(
   f: F<O, D>,
-  config?: Config<O>,
+  config?: Config<O, D, E>,
 ): {
   cancel: () => void
   error: E
@@ -194,13 +194,13 @@ useResource.withError = <E>() => <O, D>(
   value: D
 } => useResource<O, D, E>(f, config)
 
-export const useTask = <O, D>(f: F<O, D>, config?: Config<O>) => {
+export const useTask = <O, D>(f: F<O, D>, config?: Config<O, D, Error>) => {
   return useResource.withError<Error>()(f, config)
 }
 
 export const create = <O, D, E = any>(
   f: F<O, D>,
-  factoryConfig?: Config<O>,
+  factoryConfig?: Config<O, D, E>,
 ) => {
   const useResourceHook = (config?: Config<O>) => {
     return useResource<O, D, E>(f, {...factoryConfig, ...config})
@@ -208,8 +208,11 @@ export const create = <O, D, E = any>(
   return useResourceHook
 }
 
-create.withError = <E>() => <O, D>(f: F<O, D>, factoryConfig?: Config<O>) => {
-  const useResourceHook = (config?: Config<O>) => {
+create.withError = <E>() => <O, D>(
+  f: F<O, D>,
+  factoryConfig?: Config<O, D, E>,
+) => {
+  const useResourceHook = (config?: Config<O, D, E>) => {
     return useResource<O, D, E>(f, {...factoryConfig, ...config})
   }
   return useResourceHook
