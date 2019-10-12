@@ -4,7 +4,6 @@ import {
   is,
   Resource,
   succeded,
-  Tag,
 } from '@featherweight/resource-ts'
 import {getReducer, CustomReducer} from './state'
 import {useEffect, useReducer, useRef, useMemo} from 'react'
