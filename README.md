@@ -70,7 +70,7 @@ const {
   state: string,
   value?: D,
 } = useResource<O, D, E>(
-  loadFn: (o: O) => Promise<D>,
+  loadFn: (o: O, meta: Meta) => Promise<D>,
   config?: {
     args?: O
     chain?: Resource<any, any>
@@ -97,7 +97,7 @@ const useHttpResource = useResource.withError<HTTPErrorType>()
 
 ### `useTask`
 
-`useTask<D>` is an alias for `useResource<_, _, Error>`.
+`useTask<O, D>` is an alias for `useResource<O, D, Error>`.
 
 ### `create`
 
@@ -109,7 +109,7 @@ const useUserResource = create(fetchUser, {namespace: 'user'})
 
 ### `create.withError`
 
-Binds error to factory function.
+Binds error to `create` factory function.
 
 ```ts
 const useUserResource = create.withError<HttpErrorType>()(fetchUser, {
