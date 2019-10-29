@@ -14,7 +14,7 @@ export const useResourceContext = () => {
   const context = useContext(ResourceContext)
   if (context === null) {
     throw new Error(
-      `useResourceContext hook should only be used within ResourceProvider`,
+      `useResource hooks should only be used within ResourceProvider`,
     )
   }
   return context
