@@ -6,7 +6,7 @@ import {
   succeded,
 } from '@featherweight/resource-ts'
 import {getReducer, CustomReducer} from './state'
-import {useEffect, useReducer, useRef, useMemo} from 'react'
+import {useEffect, useReducer, useRef} from 'react'
 import {useResourceContext} from './context'
 
 const noop = () => {}
@@ -40,23 +40,6 @@ const toDefaults = <O, D, E>(
   reducer: c.reducer || ((_s, _a, state) => state),
   skipPending: typeof c.skipPending === 'number' ? c.skipPending : 300,
 })
-
-const useAbortController = () => {
-  const abortControllerRef = useRef<AbortController | null>(null)
-
-  if (abortControllerRef.current === null && AbortController) {
-    abortControllerRef.current = new AbortController()
-  }
-
-  return useMemo(
-    () => ({
-      abort: () => (abortControllerRef.current as AbortController).abort(),
-      renew: () => (abortControllerRef.current = new AbortController()),
-      signal: () => (abortControllerRef.current as AbortController).signal,
-    }),
-    [],
-  )
-}
 
 const useIsMounted = () => {
   const mountedRef = useRef(false)
