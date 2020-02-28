@@ -11,9 +11,9 @@ import {useResourceContext} from './context'
 
 const noop = () => {}
 
-export type Meta = {signal: AbortController['signal']}
+export type Meta = {signal?: AbortController['signal']}
 
-export type F<O = any, D = any> = (o: O, m: Meta) => Promise<D>
+export type F<O = any, D = any> = (o: O, m?: Meta) => Promise<D>
 
 export type Config<O = any, D = any, E = any> = {
   args?: O
@@ -38,13 +38,13 @@ const toDefaults = <O, D, E>(
   onFail: c.onFail || noop,
   onSuccess: c.onSuccess || noop,
   reducer: c.reducer || ((_s, _a, state) => state),
-  skipPending: c.skipPending || 300,
+  skipPending: typeof c.skipPending === 'number' ? c.skipPending : 300,
 })
 
 const useAbortController = () => {
   const abortControllerRef = useRef<AbortController | null>(null)
 
-  if (abortControllerRef.current === null) {
+  if (abortControllerRef.current === null && AbortController) {
     abortControllerRef.current = new AbortController()
   }
 
@@ -116,12 +116,13 @@ export const useResource = <O, D, E = any>(
   const context = useResourceContext()
 
   const [state, update] = useReducer(getReducer(_config.reducer), initial)
-  const abortController = useAbortController()
+  // const abortController = useAbortController()
   const isMounted = useIsMounted()
 
   const cancelF = () => {
-    abortController.abort()
-    abortController.renew()
+    // todo add abort controller polyfill
+    // abortController.abort()
+    // abortController.renew()
   }
 
   const resetF = () => {
@@ -142,7 +143,7 @@ export const useResource = <O, D, E = any>(
     let pendingAction: () => void
     let pendingTimeout: number
 
-    const ms = _config.skipPending || 300
+    const ms = _config.skipPending || 0
 
     if (ms > 0) {
       pendingAction = () => {
@@ -159,9 +160,8 @@ export const useResource = <O, D, E = any>(
           return new Promise(async () => {
             let finish
             try {
-              const value = await f(args || _config.args, {
-                signal: abortController.signal(),
-              })
+              const value = await f(args || _config.args)
+
               finish = () => {
                 if (_config.namespace) {
                   context.cache.set(_config.namespace, value)
