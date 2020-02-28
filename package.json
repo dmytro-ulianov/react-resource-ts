@@ -1,6 +1,6 @@
 {
   "name": "@featherweight/react-resource-ts",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "React bindings for Resource ADT",
   "main": "dist/index.js",
   "module": "dist/react-resource-ts.esm.js",
